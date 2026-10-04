@@ -50,25 +50,21 @@ const Dashboard = () => {
         title: "Total Outstanding",
         value: formatCurrency(data.totalOutStanding),
         icon: Wallet,
-        variant: "blue",
     },
     {
         title: "Overdue Amount",
         value: formatCurrency(data.overdueAmount),
         icon: Clock3,
-        variant: "orange",
     },
     {
         title: "Number of Debtors",
         value: data.totalDebtors,
         icon: Users,
-        variant: "green",
     },
     {
         title: "High-Risk Debtors",
         value: data.highRiskDebtors,
         icon: AlertTriangle,
-        variant: "red",
     },
     ]
 

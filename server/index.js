@@ -32,7 +32,7 @@ app.get("/api/dashboard", (req, res) => {
     totalOutStanding,
     overdueAmount,
     totalDebtors: debtors.length,
-    highRiskDebtors: debtors.filter((d) => d.risk === "High").length,
+    highRiskDebtors: debtors.filter((debtor) => debtor.risk === "High").length,
     collectionPriority,
     recentActivity: agentActivity,
   });
@@ -83,9 +83,14 @@ app.post("/api/agent/query", (req, res) => {
 
   const topDebtors = [...debtors]
     .sort((a, b) => {
-      const priorityDifference =
-        priorityOrder[b.priority] - priorityOrder[a.priority];
-      return priorityDifference || b.outstanding - a.outstanding;
+      const priorityA = priorityOrder[a.priority];
+      const priorityB = priorityOrder[b.priority];
+
+      if (priorityA !== priorityB) {
+        return priorityB - priorityA;
+      }
+
+      return b.outstanding - a.outstanding;
     })
     .slice(0, 5);
 

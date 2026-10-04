@@ -1,4 +1,4 @@
-import { Database, Download, MessageSquare, ShieldCheck } from "lucide-react";
+import { Database, MessageSquare, ShieldCheck } from "lucide-react";
 import formatCurrency from "../../utils/formatCurrency";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -6,25 +6,6 @@ import { Link } from "react-router-dom";
 const AgentResponse = ({ response, onAskAnother, onFeedBack, onReviewAction }) => {
 
     const [showSupportingData, setShowSupportingData] = useState(false);
-
-    const exportData = () => {
-        const headers = ["Debtor", "Outstanding", "Ageing", "Risk", "Priority"];
-
-        const rows = response.debtors.map((debtor) => [debtor.name, debtor.outstanding, debtor.ageing, debtor.risk, debtor.priority]);
-
-        const csv = [headers, ...rows].map((row) => row.map((value) => `"${String(value).replaceAll('"', '"')}`).join(",")).join("\r\n");
-
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-
-        link.href = url;
-        link.download = "collection-priorities.csv";
-        link.click();
-
-        URL.revokeObjectURL(url);
-    }
-
 
     return (
         <div className="agent-response">
@@ -101,8 +82,6 @@ const AgentResponse = ({ response, onAskAnother, onFeedBack, onReviewAction }) =
                 <button onClick={() => setShowSupportingData((prev) => !prev)}> <Database size={16} /> {showSupportingData ? "Hide supporting data" : "View supporting data"} </button>
 
                 <button><Link to={`/debtors/${response.debtors[0].id}`}>View debtor</Link></button>
-
-                <button onClick={exportData}> <Download size={16} />Export</button>
 
                 <button onClick={onFeedBack}>Give feedback</button>
             </div>

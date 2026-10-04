@@ -14,10 +14,8 @@ const AgentFeedback = ({ onSubmit, onCancel, submitting = false }) => {
     if (useful === false && !reason) return;
 
     onSubmit({ useful, reason: useful ? null : reason });
-
   }
-
-
+  
   return (
     <form className="agent-feedback" onSubmit={handleSubmit}>
       <h3>Was this response useful</h3>

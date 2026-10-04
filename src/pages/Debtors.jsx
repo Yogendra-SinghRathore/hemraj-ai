@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
@@ -14,11 +15,7 @@ const initialFilters = {
     priority: "",
 };
 
-const riskOrder = { Low: 1, Medium: 2, High: 3 };
-const priorityOrder = { Low: 1, Medium: 2, High: 3, Critical: 4 };
-
 const Debtors = () => {
-
     const navigate = useNavigate();
 
     const [debtors, setDebtors] = useState([]);
@@ -26,7 +23,7 @@ const Debtors = () => {
     const [error, setError] = useState("");
 
     const [filters, setFilters] = useState(initialFilters);
-    const [sort, setSort] = useState({ key: "outstanding", direction: "desc", });
+    const [sortBy, setSortBy] = useState("outstanding-desc");
     const [page, setPage] = useState(1);
 
     const loadDebtors = async () => {
@@ -37,38 +34,43 @@ const Debtors = () => {
             const data = await getDebtors();
             setDebtors(data);
         } catch {
-            setError("Unable to retrieve Finance Agent data. Please try again.")
+            setError("Unable to retrieve Finance Agent data. Please try again.");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
         loadDebtors();
-    }, [])
-
+    }, []);
 
     const handleFilterChange = (key, value) => {
         setFilters((prev) => ({ ...prev, [key]: value }));
         setPage(1);
-    }
+    };
+
+    const handleSortChange = (value) => {
+        setSortBy(value);
+        setPage(1);
+    };
 
     const handleReset = () => {
         setFilters(initialFilters);
+        setSortBy("outstanding-desc");
         setPage(1);
-    }
-
-    const handleSort = (key) => {
-        setSort((prev) => ({ key, direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc" }));
-        setPage(1);
-    }
+    };
 
     const filteredDebtors = useMemo(() => {
         const result = debtors.filter((debtor) => {
-            const matchesSearch = debtor.name.toLowerCase().includes(filters.search.trim().toLocaleLowerCase());
+            const matchesSearch = debtor.name
+                .toLowerCase()
+                .includes(filters.search.trim().toLowerCase());
 
-            const matchesRisk = !filters.risk || debtor.risk === filters.risk;
-            const matchesPriority = !filters.priority || debtor.priority === filters.priority;
+            const matchesRisk =
+                !filters.risk || debtor.risk === filters.risk;
+
+            const matchesPriority =
+                !filters.priority || debtor.priority === filters.priority;
 
             let matchesAgeing = true;
 
@@ -83,52 +85,40 @@ const Debtors = () => {
             }
 
             return (
-                matchesSearch && matchesRisk && matchesPriority && matchesAgeing
+                matchesSearch &&
+                matchesRisk &&
+                matchesPriority &&
+                matchesAgeing
             );
         });
 
         return result.sort((a, b) => {
-            let first = a[sort.key];
-            let second = b[sort.key];
-
-            if (sort.key === "risk") {
-                first = riskOrder[first];
-                second = riskOrder[second];
-            } else if (sort.key === "priority") {
-                first = priorityOrder[first];
-                second = priorityOrder[second]
+            if (sortBy === "outstanding-asc") {
+                return a.outstanding - b.outstanding;
             }
-
-            let comparison;
-
-            if (typeof first === "number" && typeof second === "number") {
-                comparison = first - second;
-            } else {
-                comparison = String(first).localeCompare(String(second));
-            }
-
-            return sort.direction === "asc" ? comparison : -comparison;
-
+            return b.outstanding - a.outstanding;
         });
-
-
-    }, [filters, sort, debtors])
+    }, [debtors, filters, sortBy]);
 
     const totalPages = Math.max(1, Math.ceil(filteredDebtors.length / PAGE_SIZE));
 
     const startIndex = (page - 1) * PAGE_SIZE;
 
-    const paginatedDebtors = filteredDebtors.slice(startIndex, startIndex + PAGE_SIZE);
+    const paginatedDebtors = filteredDebtors.slice(
+        startIndex,
+        startIndex + PAGE_SIZE
+    );
 
+    if (loading) return <p>Loading debtors...</p>;
 
-    if (loading) return <p>Loading debtors...</p>
-
-    if (error) return (
-        <div className="api-error">
-            <p>{error}</p>
-            <button onClick={loadDebtors}>Try Again</button>
-        </div>
-    )
+    if (error) {
+        return (
+            <div className="api-error">
+                <p>{error}</p>
+                <button onClick={loadDebtors}>Try Again</button>
+            </div>
+        );
+    }
 
     return (
         <div className="debtors-page">
@@ -145,7 +135,13 @@ const Debtors = () => {
             </div>
 
             <div className="debtors-panel">
-                <DebtorFilters filters={filters} onFilterChange={handleFilterChange} onReset={handleReset} />
+                <DebtorFilters
+                    filters={filters}
+                    onFilterChange={handleFilterChange}
+                    sortBy={sortBy}
+                    onSortChange={handleSortChange}
+                    onReset={handleReset}
+                />
 
                 {filteredDebtors.length === 0 ? (
                     <div className="debtors-empty">
@@ -156,26 +152,46 @@ const Debtors = () => {
                     </div>
                 ) : (
                     <>
-                        <DebtorTable debtors={paginatedDebtors} sort={sort} onSort={handleSort} onViewDebtor={(id) => navigate(`/debtors/${id}`)} />
+                        <DebtorTable
+                            debtors={paginatedDebtors}
+                            onViewDebtor={(id) => navigate(`/debtors/${id}`)}
+                        />
 
                         <div className="debtor-pagination">
-                            <p>Showing {startIndex + 1} - {Math.min(startIndex + PAGE_SIZE, filteredDebtors.length)} of{" "} {filteredDebtors.length}</p>
+                            <p>
+                                Showing {startIndex + 1} -{" "}
+                                {Math.min(
+                                    startIndex + PAGE_SIZE,
+                                    filteredDebtors.length
+                                )}{" "}
+                                of {filteredDebtors.length}
+                            </p>
 
                             <div className="pagination-buttons">
-                                <button disabled={page === 1} onClick={() => setPage((prev) => prev - 1)}> <ChevronLeft size={18} /> </button>
+                                <button
+                                    disabled={page === 1}
+                                    onClick={() => setPage((prev) => prev - 1)}
+                                >
+                                    <ChevronLeft size={18} />
+                                </button>
 
-                                <span>Page {page} of {totalPages}</span>
+                                <span>
+                                    Page {page} of {totalPages}
+                                </span>
 
-                                <button disabled={page === totalPages} onClick={() => setPage((prev) => prev + 1)}> <ChevronRight size={18} /> </button>
+                                <button
+                                    disabled={page === totalPages}
+                                    onClick={() => setPage((prev) => prev + 1)}
+                                >
+                                    <ChevronRight size={18} />
+                                </button>
                             </div>
                         </div>
                     </>
                 )}
-
             </div>
-
         </div>
-    )
-}
+    );
+};
 
-export default Debtors
+export default Debtors;

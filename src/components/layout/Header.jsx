@@ -1,17 +1,6 @@
-import { Bell, ChevronDown, Menu } from "lucide-react"
-import { useLocation } from "react-router-dom"
+import { Menu } from "lucide-react"
 
 const Header = ({ onMenuClick }) => {
-
-    const { pathname } = useLocation();
-
-    const pageTitles = {
-        "/": "Finance Overview",
-        "/debtors": "Debtors",
-        "/agent": "Finance Agent",
-        "/activity": "Agent Activity",
-    }
-
 
     return (
         <header className="app-header">
@@ -19,7 +8,7 @@ const Header = ({ onMenuClick }) => {
                 <button className="menu-toggle" onClick={onMenuClick}> <Menu size={22} /> </button>
 
                 <div>
-                    <h1>{pageTitles[pathname] || "Hemraj AI"}</h1>
+                    <h1>Hemraj AI</h1>
                     <p>Finance intelligence and collection management</p>
                 </div>
             </div>

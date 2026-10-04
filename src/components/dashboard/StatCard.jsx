@@ -8,7 +8,7 @@ const StatCard = ({ state }) => {
             <div className="stat-card-top">
                 <span className='stat-title'>{state.title}</span>
 
-                <div className={`stat-icon stat-icon-${state.variant}`}>
+                <div className="stat-icon">
                     {Icon && <Icon size={20} />}
                 </div>
             </div>
