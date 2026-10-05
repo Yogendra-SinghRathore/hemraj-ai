@@ -1,12 +1,7 @@
-import { ShieldAlert } from "lucide-react"
-
 const ActionConfirmation = ({ debtor, onApprove, onCancel }) => {
   return (
     <div className="agent-modal-overlay" onClick={onCancel}>
       <div className="agent-modal" role="dialog" aria-modal="true" aria-labelledby="action-dialog-title" onClick={(e) => e.stopPropagation()}>
-        <div className="agent-modal-icon">
-          <ShieldAlert size={24} />
-        </div>
 
         <h2 id="action-dialog-title">Review Agent Action</h2>
 

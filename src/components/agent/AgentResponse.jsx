@@ -1,4 +1,4 @@
-import { Database, MessageSquare, ShieldCheck } from "lucide-react";
+import { Database, MessageSquare } from "lucide-react";
 import formatCurrency from "../../utils/formatCurrency";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -29,7 +29,6 @@ const AgentResponse = ({ response, onAskAnother, onFeedBack, onReviewAction }) =
 
             <div className="agent-recommendation">
                 <div className="agent-recommendation-title">
-                    <ShieldCheck size={18} />
                     <h3>Recommended Action</h3>
                 </div>
 

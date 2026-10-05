@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Users } from "lucide-react";
 import DebtorFilters from "../components/debtors/DebtorFilters";
@@ -60,45 +60,26 @@ const Debtors = () => {
         setPage(1);
     };
 
-    const filteredDebtors = useMemo(() => {
-        const result = debtors.filter((debtor) => {
-            const matchesSearch = debtor.name
-                .toLowerCase()
-                .includes(filters.search.trim().toLowerCase());
-
-            const matchesRisk =
-                !filters.risk || debtor.risk === filters.risk;
-
-            const matchesPriority =
-                !filters.priority || debtor.priority === filters.priority;
+    const filteredDebtors = debtors
+        .filter((debtor) => {
+            const matchesSearch = debtor.name.toLowerCase().includes(filters.search.trim().toLowerCase());
+            const matchesRisk = !filters.risk || debtor.risk === filters.risk;
+            const matchesPriority = !filters.priority || debtor.priority === filters.priority;
 
             let matchesAgeing = true;
+            if (filters.ageing === "0-30") matchesAgeing = debtor.ageing <= 30;
+            else if (filters.ageing === "31-60") matchesAgeing = debtor.ageing >= 31 && debtor.ageing <= 60;
+            else if (filters.ageing === "61-90") matchesAgeing = debtor.ageing >= 61 && debtor.ageing <= 90;
+            else if (filters.ageing === "90+") matchesAgeing = debtor.ageing > 90;
 
-            if (filters.ageing === "0-30") {
-                matchesAgeing = debtor.ageing <= 30;
-            } else if (filters.ageing === "31-60") {
-                matchesAgeing = debtor.ageing >= 31 && debtor.ageing <= 60;
-            } else if (filters.ageing === "61-90") {
-                matchesAgeing = debtor.ageing >= 61 && debtor.ageing <= 90;
-            } else if (filters.ageing === "90+") {
-                matchesAgeing = debtor.ageing > 90;
-            }
-
-            return (
-                matchesSearch &&
-                matchesRisk &&
-                matchesPriority &&
-                matchesAgeing
-            );
-        });
-
-        return result.sort((a, b) => {
+            return matchesSearch && matchesRisk && matchesPriority && matchesAgeing;
+        })
+        .sort((a, b) => {
             if (sortBy === "outstanding-asc") {
                 return a.outstanding - b.outstanding;
             }
             return b.outstanding - a.outstanding;
         });
-    }, [debtors, filters, sortBy]);
 
     const totalPages = Math.max(1, Math.ceil(filteredDebtors.length / PAGE_SIZE));
 
@@ -128,10 +109,6 @@ const Debtors = () => {
                     <p>View and manage outstanding accounts</p>
                 </div>
 
-                <div className="debtor-count">
-                    <Users size={17} />
-                    <span>{filteredDebtors.length} Debtors</span>
-                </div>
             </div>
 
             <div className="debtors-panel">
