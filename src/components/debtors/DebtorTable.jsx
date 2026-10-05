@@ -10,18 +10,6 @@ const columns = [
   { label: "Priority", key: "priority" },
 ];
 
-const formatDate = (date) => {
-  if (!date) return "_";
-
-  return new Date(`${date}T00:00:00`).toLocaleDateString(
-    "en-IN",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }
-  );
-};
 
 const DebtorTable = ({ debtors, onViewDebtor }) => {
   return (
@@ -55,7 +43,7 @@ const DebtorTable = ({ debtors, onViewDebtor }) => {
 
               <td>{debtor.ageing}</td>
 
-              <td>{formatDate(debtor.lastPayment)}</td>
+              <td>{debtor.lastPayment}</td>
 
               <td>
                 <span
